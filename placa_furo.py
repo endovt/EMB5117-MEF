@@ -29,7 +29,7 @@ Parameters = getInputs(fields=(
     label='Please specify the parameters:',  # Question
     dialogTitle='Plate with circular hole',  # Main title
 )
-# Then, assing scalar variables
+# Then, assign scalar variables
 plate_hl   = float(Parameters[0])
 plate_t    = float(Parameters[1])
 hole_r     = float(Parameters[2])
