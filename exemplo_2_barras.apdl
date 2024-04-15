@@ -1,0 +1,56 @@
+/CLEAR
+! exemplo barra
+
+/PREP7
+! node
+N,1,0,0
+N,2,1000,2000
+N,3,2000,0
+! element type: truss
+ET,1,LINK180 
+! material 1
+MPTEMP,,,,,,,,  
+MPTEMP,1,0  
+MPDATA,EX,1,,200000 
+MPDATA,PRXY,1,,0.3  
+! material 2
+MPTEMP,,,,,,,,  
+MPTEMP,1,0  
+MPDATA,EX,2,,70000  
+MPDATA,PRXY,2,,0.3  
+! section 1
+SECTYPE,1,LINK, ,section_1 
+SECDATA,25, 
+SECCONTROL,0,0  
+! section 2
+SECTYPE,2,LINK, ,section_2
+SECDATA,16, 
+SECCONTROL,0,0  
+! element 1
+TYPE,1
+MAT,1
+SECNUM,1
+E,1,2
+! element 2
+TYPE,1
+MAT,2
+SECNUM,2
+E,2,3
+! boundary condition
+D,1,,0,,,,UX,UY   
+D,3,,0,,,,UX,UY 
+! load
+F,2,FY,10000
+
+/ESHAPE,1
+EPLOT
+
+/SOLU
+SOLVE
+
+/POST1
+/EFACET,1   
+PLNSOL,S,X,0,1.0  
+
+*GET,u2x,NODE,2,U,X, 
+*GET,u2y,NODE,2,U,Y, 
