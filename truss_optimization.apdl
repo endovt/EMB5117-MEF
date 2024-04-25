@@ -1,0 +1,118 @@
+/CLEAR
+/PREP7
+
+! design variables
+*SET,l,2000
+*SET,h,500
+*SET,h1,100
+*SET,h2,170
+*SET,h3,230
+*SET,h4,250
+*SET,a1,1000
+*SET,a2,300
+*SET,a3,500
+*SET,a4,1500
+
+! auxiliary parameter
+x_inc = (l/8)
+! node bottom (left to right)
+N,1,-4*x_inc,0
+N,2,-3*x_inc,h1
+N,3,-2*x_inc,h2
+N,4,-x_inc,h3
+N,5,0,h4
+N,6,x_inc,h3
+N,7,2*x_inc,h2
+N,8,3*x_inc,h1
+N,9,4*x_inc,0
+! node top (left to right)
+N,10,-4*x_inc,h
+N,11,-3*x_inc,h
+N,12,-2*x_inc,h
+N,13,-x_inc,h
+N,14,0,h
+N,15,x_inc,h
+N,16,2*x_inc,h
+N,17,3*x_inc,h
+N,18,4*x_inc,h
+! material
+MPTEMP,,,,,,,,  
+MPTEMP,1,0  
+MPDATA,EX,1,,200000 
+MPDATA,PRXY,1,,0.3  
+MPTEMP,,,,,,,,  
+MPTEMP,1,0  
+MPDATA,DENS,1,,7.8e-9   
+! element type
+ET,1,LINK180
+! section
+SECTYPE,1,LINK, ,top 
+SECDATA,a1, 
+SECTYPE,2,LINK, ,vert 
+SECDATA,a2, 
+SECTYPE,3,LINK, ,diag 
+SECDATA,a3, 
+SECTYPE,4,LINK, ,bottom 
+SECDATA,a4, 
+
+! mesh: element bottom
+SECN,4
+E,1,2
+*REPEAT,8,1,1
+! mesh: element top
+SECN,1
+E,10,11
+*REPEAT,8,1,1
+! mesh: element vert
+SECN,2
+E,1,10
+*REPEAT,9,1,1
+! mesh: element diag
+SECN,3
+E,2,10
+*REPEAT,4,2,2
+E,2,12
+*REPEAT,4,2,2
+
+! boundary condition
+D,1,ALL,0
+D,9,ALL,0
+! load
+ACEL,,9800,
+F,10,FY,-500
+F,11,FY,-500
+F,12,FY,-500
+F,13,FY,-500
+F,14,FY,-500
+F,15,FY,-500
+F,16,FY,-500
+F,17,FY,-500
+F,18,FY,-500
+
+! solution
+FINISH  
+/SOL
+SOLVE   
+FINISH  
+
+! results
+/POST1  
+/ESHAPE,1
+/EFACET,1   
+SET,LAST
+
+/COM, Summary of results
+! mass calculation
+*GET,mass,ELEM,0,MTOT,X
+/COM,Mass = %mass*1000% kg
+! max vertical displacement
+PLNSOL,U,Y
+*GET, uy_min, PLNSOL, 0, MIN
+/COM,Vert disp (min) = %uy_min% mm
+! stress (range of values)
+PLNSOL, S,X, 0,1.0 
+*GET, sx_min, PLNSOL, 0, MIN
+*GET, sx_max, PLNSOL, 0, MAX 
+/COM,Stress (min)= %sx_min% MPa, Stress (max)= %sx_max% MPa
+/TITLE, Total mass = %mass*1000% kg; Vert disp (min) = %uy_min% mm.
+/REPLOT
