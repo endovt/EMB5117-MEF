@@ -1,46 +1,34 @@
 /CLEAR
-! exemplo mola
-
-/PREP7 
-! node 
+/PREP7  
+! node
 N,1,0,0
-N,2,1000,0
-N,3,2000,0
-N,4,3000,0
-N,5,4000,0
-! element type: spring
+N,2,100,0
+N,3,200,0
+! spring element  
 ET,1,COMBIN14   
-! spring stiffness
-R,1,200 
-R,2,100
-R,3,150 
-R,4,300  
-R,5,400 
-R,6,500  
+KEYOPT,1,1,0
+KEYOPT,1,2,0
+KEYOPT,1,3,0
+! spring prop
+R,1,10   
+R,2,20   
 ! mesh
 REAL,1
 E,1,2
 REAL,2
 E,2,3
-REAL,3
-E,2,3
-REAL,4
-E,2,4
-REAL,5
-E,3,4
-REAL,6
-E,4,5
-! boundary condition
-D,1,,0,,,,UX 
-D,5,,0,,,,UX 
-! load
-F,2,FX,400
-F,3,FX,300
-F,4,FX,500
+! load 
+F,3, FX, 30
+! bc
+D,1, UX, 0
 
 /SOLU
 SOLVE
 
-/POST1
-PLNSOL,U,X, 0,1.0
-PRNSOL,U,X
+FINISH  
+/POST1  
+/EFACET,1   
+PLNSOL, U,X, 0,1.0  
+/VSCALE,1,1,0   
+PLVECT,U, , , ,VECT,ELEM,ON,0   
+PRNSOL,U,X  
