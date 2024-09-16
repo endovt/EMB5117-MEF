@@ -39,6 +39,7 @@ plate_pres = float(Parameters[4])
 mesh_size  = float(Parameters[5])
 e_corner   = int(Parameters[6])
 # -------------------------------------------------------------------------
+# Model 1: geometry
 mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
 mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 0.0), point2=(
     plate_l, 0.0))
@@ -92,6 +93,8 @@ mdb.models['Model-1'].Part(dimensionality=TWO_D_PLANAR, name='Part-1', type=
 mdb.models['Model-1'].parts['Part-1'].BaseShell(sketch=
     mdb.models['Model-1'].sketches['__profile__'])
 del mdb.models['Model-1'].sketches['__profile__']
+# -------------------------------------------------------------------------
+# Model 1: mesh
 mdb.models['Model-1'].parts['Part-1'].setMeshControls(elemShape=TRI, regions=
     mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask(('[#1 ]', 
     ), ))
@@ -112,9 +115,13 @@ mdb.models['Model-1'].parts['Part-1'].seedEdgeByNumber(constraint=FINER, edges=
     mdb.models['Model-1'].parts['Part-1'].edges.getSequenceFromMask(('[#30 ]', 
     ), ), number=e_corner)
 mdb.models['Model-1'].parts['Part-1'].generateMesh()
+# -------------------------------------------------------------------------
+# Model 1: material
 mdb.models['Model-1'].Material(name='Material-1')
 mdb.models['Model-1'].materials['Material-1'].Elastic(table=((200000.0, 0.3), 
     ))
+# -------------------------------------------------------------------------
+# Model 1: section
 mdb.models['Model-1'].HomogeneousSolidSection(material='Material-1', name=
     'Section-1', thickness=plate_t)
 mdb.models['Model-1'].parts['Part-1'].Set(faces=
@@ -124,10 +131,16 @@ mdb.models['Model-1'].parts['Part-1'].SectionAssignment(offset=0.0,
     offsetField='', offsetType=MIDDLE_SURFACE, region=
     mdb.models['Model-1'].parts['Part-1'].sets['Set-4'], sectionName=
     'Section-1', thicknessAssignment=FROM_SECTION)
+# -------------------------------------------------------------------------
+# Model 1: assembly
 mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
 mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-1-1', 
     part=mdb.models['Model-1'].parts['Part-1'])
+# -------------------------------------------------------------------------
+# Model 1: step
 mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
+# -------------------------------------------------------------------------
+# Model 1: bc
 mdb.models['Model-1'].rootAssembly.Set(edges=
     mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].edges.getSequenceFromMask(
     ('[#1 ]', ), ), name='Set-1')
@@ -135,12 +148,17 @@ mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1',
     distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
     'BC-1', region=mdb.models['Model-1'].rootAssembly.sets['Set-1'], u1=0.0, 
     u2=0.0, ur3=UNSET)
+# -------------------------------------------------------------------------
+# Model 1: load
 mdb.models['Model-1'].rootAssembly.Surface(name='Surf-1', side1Edges=
     mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].edges.getSequenceFromMask(
     ('[#8 ]', ), ))
 mdb.models['Model-1'].Pressure(amplitude=UNSET, createStepName='Step-1', 
     distributionType=UNIFORM, field='', magnitude=plate_pres, name='Load-1', region=
     mdb.models['Model-1'].rootAssembly.surfaces['Surf-1'])
+
+# -------------------------------------------------------------------------
+# Model 2: geometry
 mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-2')
 mdb.models['Model-2'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
 mdb.models['Model-2'].sketches['__profile__'].Line(point1=(0.0, 0.0), point2=(
@@ -243,6 +261,7 @@ mdb.models['Model-2'].rootAssembly.Surface(name='Surf-1', side1Edges=
 mdb.models['Model-2'].Pressure(amplitude=UNSET, createStepName='Step-1', 
     distributionType=UNIFORM, field='', magnitude=plate_pres, name='Load-1', region=
     mdb.models['Model-2'].rootAssembly.surfaces['Surf-1'])
+# Create Job
 mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
     explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
     memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, name=
